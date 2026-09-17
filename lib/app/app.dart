@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/design/app_theme.dart';
 import 'app_router.dart';
 
 class TohyouApp extends StatelessWidget {
@@ -11,10 +12,7 @@ class TohyouApp extends StatelessWidget {
       title: 'TOHYOU',
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
+      theme: TohyouTheme.dark(),
     );
   }
 }
