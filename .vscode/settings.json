@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/mnt/Seulgi/Tohbuu/Files/Codes/tohyou/linux"
+    "cmake.sourceDirectory": "/mnt/Seulgi/Tohbuu/Files/Codes/tohyou/linux",
+    "java.compile.nullAnalysis.mode": "automatic"
 }
