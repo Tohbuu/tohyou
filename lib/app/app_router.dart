@@ -83,5 +83,6 @@ final GoRouter appRouter = GoRouter(
         return const ShowcaseScreen();
       },
     ),
+
   ],
 );

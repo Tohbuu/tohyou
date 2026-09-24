@@ -116,7 +116,7 @@ class HomeScreen extends StatelessWidget {
     List<_HomeTitle> titles,
   ) {
     return SizedBox(
-      height: 310,
+      height: 320,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: titles.length,
