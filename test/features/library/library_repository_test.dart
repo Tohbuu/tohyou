@@ -3,6 +3,8 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tohyou/core/database/app_database.dart';
 import 'package:tohyou/features/library/data/library_repository.dart';
+import 'package:tohyou/features/library/domain/library_status.dart';
+import 'package:tohyou/features/library/domain/media_type.dart';
 
 void main() {
   late AppDatabase database;
@@ -23,7 +25,9 @@ void main() {
   }) {
     final now = DateTime.now();
 
-    return database.into(database.mediaTable).insert(
+    return database
+        .into(database.mediaTable)
+        .insert(
           MediaTableCompanion.insert(
             title: title,
             type: type,
@@ -44,7 +48,7 @@ void main() {
 
     await repository.addToLibrary(
       mediaId: mediaId,
-      status: 'watching',
+      status: LibraryStatus.watching,
       progress: 5,
       total: 28,
     );
@@ -54,8 +58,8 @@ void main() {
     expect(library, hasLength(1));
     expect(library.first.mediaId, mediaId);
     expect(library.first.title, 'Frieren: Beyond Journey\'s End');
-    expect(library.first.type, 'anime');
-    expect(library.first.status, 'watching');
+    expect(library.first.type, MediaType.anime);
+    expect(library.first.status, LibraryStatus.watching);
     expect(library.first.progress, 5);
     expect(library.first.total, 28);
     expect(library.first.favorite, isFalse);
@@ -66,7 +70,7 @@ void main() {
 
     final entryId = await repository.addToLibrary(
       mediaId: mediaId,
-      status: 'watching',
+      status: LibraryStatus.watching,
       progress: 3,
       total: 12,
     );
@@ -91,7 +95,7 @@ void main() {
 
     final entryId = await repository.addToLibrary(
       mediaId: mediaId,
-      status: 'watching',
+      status: LibraryStatus.watching,
       progress: 3,
       total: 12,
     );
@@ -115,19 +119,19 @@ void main() {
 
     final entryId = await repository.addToLibrary(
       mediaId: mediaId,
-      status: 'plan_to_watch',
+      status: LibraryStatus.planToWatch,
     );
 
     final updated = await repository.updateStatus(
       libraryEntryId: entryId,
-      status: 'watching',
+      status: LibraryStatus.watching,
     );
 
     expect(updated, isTrue);
 
     final entry = await repository.getEntry(entryId);
 
-    expect(entry!.status, 'watching');
+    expect(entry!.status, LibraryStatus.watching);
   });
 
   test('toggles favorite', () async {
@@ -135,7 +139,7 @@ void main() {
 
     final entryId = await repository.addToLibrary(
       mediaId: mediaId,
-      status: 'watching',
+      status: LibraryStatus.watching,
     );
 
     final firstToggle = await repository.toggleFavorite(entryId);
@@ -163,7 +167,7 @@ void main() {
 
     final updatedStatus = await repository.updateStatus(
       libraryEntryId: 999,
-      status: 'completed',
+      status: LibraryStatus.completed,
     );
 
     final toggledFavorite = await repository.toggleFavorite(999);
@@ -174,14 +178,11 @@ void main() {
   });
 
   test('removes a library entry', () async {
-    final mediaId = await createTestMedia(
-      title: 'Test Manga',
-      type: 'manga',
-    );
+    final mediaId = await createTestMedia(title: 'Test Manga', type: 'manga');
 
     final entryId = await repository.addToLibrary(
       mediaId: mediaId,
-      status: 'reading',
+      status: LibraryStatus.reading,
     );
 
     expect(await repository.getLibrary(), hasLength(1));

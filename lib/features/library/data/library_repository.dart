@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 
 import '../../../core/database/app_database.dart';
 import '../domain/library_entry.dart';
+import '../domain/library_status.dart';
+import '../domain/media_type.dart';
 
 class LibraryRepository {
   LibraryRepository(this._database);
@@ -28,8 +30,8 @@ class LibraryRepository {
         id: libraryEntry.id,
         mediaId: libraryEntry.mediaId,
         title: media.title,
-        type: media.type,
-        status: libraryEntry.status,
+        type: MediaType.fromValue(media.type),
+        status: LibraryStatus.fromValue(libraryEntry.status),
         progress: libraryEntry.progress,
         total: libraryEntry.total,
         favorite: libraryEntry.favorite,
@@ -46,10 +48,7 @@ class LibraryRepository {
           _database.libraryEntriesTable.mediaId,
         ),
       ),
-    ])
-      ..where(
-        _database.libraryEntriesTable.id.equals(libraryEntryId),
-      );
+    ])..where(_database.libraryEntriesTable.id.equals(libraryEntryId));
 
     final row = await query.getSingleOrNull();
 
@@ -64,8 +63,8 @@ class LibraryRepository {
       id: libraryEntry.id,
       mediaId: libraryEntry.mediaId,
       title: media.title,
-      type: media.type,
-      status: libraryEntry.status,
+      type: MediaType.fromValue(media.type),
+      status: LibraryStatus.fromValue(libraryEntry.status),
       progress: libraryEntry.progress,
       total: libraryEntry.total,
       favorite: libraryEntry.favorite,
@@ -75,17 +74,19 @@ class LibraryRepository {
 
   Future<int> addToLibrary({
     required int mediaId,
-    required String status,
+    required LibraryStatus status,
     int progress = 0,
     int? total,
     bool favorite = false,
   }) {
     final now = DateTime.now();
 
-    return _database.into(_database.libraryEntriesTable).insert(
+    return _database
+        .into(_database.libraryEntriesTable)
+        .insert(
           LibraryEntriesTableCompanion.insert(
             mediaId: mediaId,
-            status: status,
+            status: status.value,
             progress: Value(progress),
             total: Value(total),
             favorite: Value(favorite),
@@ -100,37 +101,33 @@ class LibraryRepository {
     required int progress,
     int? total,
   }) async {
-    final updated = await (_database.update(
-      _database.libraryEntriesTable,
-    )..where(
-        (table) => table.id.equals(libraryEntryId),
-      ))
-        .write(
-      LibraryEntriesTableCompanion(
-        progress: Value(progress),
-        total: Value(total),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
+    final updated =
+        await (_database.update(
+          _database.libraryEntriesTable,
+        )..where((table) => table.id.equals(libraryEntryId))).write(
+          LibraryEntriesTableCompanion(
+            progress: Value(progress),
+            total: Value(total),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
 
     return updated > 0;
   }
 
   Future<bool> updateStatus({
     required int libraryEntryId,
-    required String status,
+    required LibraryStatus status,
   }) async {
-    final updated = await (_database.update(
-      _database.libraryEntriesTable,
-    )..where(
-        (table) => table.id.equals(libraryEntryId),
-      ))
-        .write(
-      LibraryEntriesTableCompanion(
-        status: Value(status),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
+    final updated =
+        await (_database.update(
+          _database.libraryEntriesTable,
+        )..where((table) => table.id.equals(libraryEntryId))).write(
+          LibraryEntriesTableCompanion(
+            status: Value(status.value),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
 
     return updated > 0;
   }
@@ -138,26 +135,21 @@ class LibraryRepository {
   Future<bool> toggleFavorite(int libraryEntryId) async {
     final entry = await (_database.select(
       _database.libraryEntriesTable,
-    )..where(
-        (table) => table.id.equals(libraryEntryId),
-      ))
-        .getSingleOrNull();
+    )..where((table) => table.id.equals(libraryEntryId))).getSingleOrNull();
 
     if (entry == null) {
       return false;
     }
 
-    final updated = await (_database.update(
-      _database.libraryEntriesTable,
-    )..where(
-        (table) => table.id.equals(libraryEntryId),
-      ))
-        .write(
-      LibraryEntriesTableCompanion(
-        favorite: Value(!entry.favorite),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
+    final updated =
+        await (_database.update(
+          _database.libraryEntriesTable,
+        )..where((table) => table.id.equals(libraryEntryId))).write(
+          LibraryEntriesTableCompanion(
+            favorite: Value(!entry.favorite),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
 
     return updated > 0;
   }

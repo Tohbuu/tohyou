@@ -1,3 +1,6 @@
+import 'library_status.dart';
+import 'media_type.dart';
+
 class LibraryEntry {
   const LibraryEntry({
     required this.id,
@@ -14,8 +17,8 @@ class LibraryEntry {
   final int id;
   final int mediaId;
   final String title;
-  final String type;
-  final String status;
+  final MediaType type;
+  final LibraryStatus status;
   final int progress;
   final int? total;
   final bool favorite;

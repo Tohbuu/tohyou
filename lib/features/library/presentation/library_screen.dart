@@ -8,6 +8,7 @@ import '../../../core/design/components/tohyou_section.dart';
 import '../../../core/design/components/tohyou_surface.dart';
 import '../data/library_repository.dart';
 import '../domain/library_entry.dart';
+import '../domain/library_status.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -80,7 +81,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
       await _repository.addToLibrary(
         mediaId: mediaId,
-        status: 'watching',
+        status: LibraryStatus.watching,
         progress: 3,
         total: 28,
       );
@@ -224,7 +225,7 @@ class _LibraryCard extends StatelessWidget {
             children: [
               TohyouPosterCard(
                 title: entry.title,
-                subtitle: entry.type.toUpperCase(),
+                subtitle: entry.type.value.toUpperCase(),
                 imageUrl: entry.coverUrl,
               ),
               Positioned(
@@ -241,7 +242,7 @@ class _LibraryCard extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          entry.status.toUpperCase(),
+          entry.status.value.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall,
         ),
         const SizedBox(height: 4),
