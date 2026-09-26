@@ -1,0 +1,1 @@
+enum ProviderType { anime, manga }
