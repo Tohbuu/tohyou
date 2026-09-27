@@ -1,0 +1,92 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tohyou/features/provider/data/mock_anime_provider.dart';
+import 'package:tohyou/features/provider/data/mock_manga_provider.dart';
+import 'package:tohyou/features/provider/domain/provider_registry.dart';
+import 'package:tohyou/features/provider/domain/provider_service.dart';
+
+void main() {
+  late ProviderService service;
+
+  setUp(() {
+    service = ProviderService(
+      ProviderRegistry(providers: [MockAnimeProvider(), MockMangaProvider()]),
+    );
+  });
+
+  group('ProviderService', () {
+    test('searches anime through selected provider', () async {
+      final results = await service.searchAnime('mock-anime', 'One');
+
+      expect(results, hasLength(1));
+      expect(results.first.id, 'mock-anime-1');
+    });
+
+    test('gets anime details through selected provider', () async {
+      final anime = await service.getAnimeDetails('mock-anime', 'mock-anime-1');
+
+      expect(anime, isNotNull);
+      expect(anime!.title, 'Mock Anime One');
+    });
+
+    test('gets anime episodes through selected provider', () async {
+      final episodes = await service.getEpisodes('mock-anime', 'mock-anime-1');
+
+      expect(episodes, hasLength(3));
+      expect(episodes.first.number, 1);
+    });
+
+    test('gets anime streams through selected provider', () async {
+      final streams = await service.getStreams(
+        'mock-anime',
+        'mock-anime-1-episode-1',
+      );
+
+      expect(streams, hasLength(2));
+    });
+
+    test('searches manga through selected provider', () async {
+      final results = await service.searchManga('mock-manga', 'One');
+
+      expect(results, hasLength(1));
+      expect(results.first.id, 'mock-manga-1');
+    });
+
+    test('gets manga details through selected provider', () async {
+      final manga = await service.getMangaDetails('mock-manga', 'mock-manga-1');
+
+      expect(manga, isNotNull);
+      expect(manga!.title, 'Mock Manga One');
+    });
+
+    test('gets manga chapters through selected provider', () async {
+      final chapters = await service.getChapters('mock-manga', 'mock-manga-1');
+
+      expect(chapters, hasLength(3));
+      expect(chapters.first.number, 1);
+    });
+
+    test('gets manga pages through selected provider', () async {
+      final pages = await service.getPages(
+        'mock-manga',
+        'mock-manga-1-chapter-1',
+      );
+
+      expect(pages, hasLength(3));
+      expect(pages.first.index, 0);
+    });
+
+    test('throws for unknown anime provider id', () async {
+      expect(
+        () => service.searchAnime('missing', 'One'),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('throws when manga operation receives anime provider id', () async {
+      expect(
+        () => service.searchManga('mock-anime', 'One'),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+  });
+}
