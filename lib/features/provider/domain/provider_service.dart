@@ -7,11 +7,16 @@ import 'manga.dart';
 import 'manga_provider.dart';
 import 'provider_registry.dart';
 import 'stream_source.dart';
+import 'provider_selection.dart';
 
 class ProviderService {
-  const ProviderService(this.registry);
+  const ProviderService(
+    this.registry, {
+    this.selection = const ProviderSelection(),
+  });
 
   final ProviderRegistry registry;
+  final ProviderSelection selection;
 
   AnimeProvider _getAnimeProvider(String providerId) {
     final provider = registry.getById(providerId);
@@ -71,5 +76,85 @@ class ProviderService {
 
   Future<List<ChapterPage>> getPages(String providerId, String chapterId) {
     return _getMangaProvider(providerId).getPages(chapterId);
+  }
+
+  Future<List<Anime>> searchSelectedAnime(String query) {
+    final providerId = selection.animeProviderId;
+
+    if (providerId == null) {
+      throw StateError('No anime provider is selected');
+    }
+
+    return searchAnime(providerId, query);
+  }
+
+  Future<List<Manga>> searchSelectedManga(String query) {
+    final providerId = selection.mangaProviderId;
+
+    if (providerId == null) {
+      throw StateError('No manga provider is selected');
+    }
+
+    return searchManga(providerId, query);
+  }
+
+  Future<Anime?> getSelectedAnimeDetails(String id) {
+    final providerId = selection.animeProviderId;
+
+    if (providerId == null) {
+      throw StateError('No anime provider is selected');
+    }
+
+    return getAnimeDetails(providerId, id);
+  }
+
+  Future<Manga?> getSelectedMangaDetails(String id) {
+    final providerId = selection.mangaProviderId;
+
+    if (providerId == null) {
+      throw StateError('No manga provider is selected');
+    }
+
+    return getMangaDetails(providerId, id);
+  }
+
+  Future<List<Episode>> getSelectedEpisodes(String animeId) {
+    final providerId = selection.animeProviderId;
+
+    if (providerId == null) {
+      throw StateError('No anime provider is selected');
+    }
+
+    return getEpisodes(providerId, animeId);
+  }
+
+  Future<List<StreamSource>> getSelectedStreams(String episodeId) {
+    final providerId = selection.animeProviderId;
+
+    if (providerId == null) {
+      throw StateError('No anime provider is selected');
+    }
+
+    return getStreams(providerId, episodeId);
+  }
+
+  Future<List<Chapter>> getSelectedChapters(String mangaId) {
+    final providerId = selection.mangaProviderId;
+
+    if (providerId == null) {
+      throw StateError('No manga provider is selected');
+    }
+
+    return getChapters(providerId, mangaId);
+  }
+
+  Future<List<ChapterPage>> getSelectedPages(String chapterId) {
+    final providerId = selection.mangaProviderId;
+
+    if (providerId == null) {
+      throw StateError('No manga provider is selected');
+    }
+
+    return getPages(providerId, chapterId);
   }
 }
