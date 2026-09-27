@@ -27,18 +27,65 @@ void main() {
   });
 
   group('ProviderCapabilities', () {
-    test('defaults capabilities to false', () {
+    test('defaults all capabilities to false', () {
       const capabilities = ProviderCapabilities();
 
       expect(capabilities.search, isFalse);
       expect(capabilities.details, isFalse);
+      expect(capabilities.episodes, isFalse);
+      expect(capabilities.streaming, isFalse);
+      expect(capabilities.chapters, isFalse);
+      expect(capabilities.pages, isFalse);
     });
 
     test('stores configured capabilities', () {
-      const capabilities = ProviderCapabilities(search: true, details: true);
+      const capabilities = ProviderCapabilities(
+        search: true,
+        details: true,
+        episodes: true,
+        streaming: true,
+        chapters: true,
+        pages: true,
+      );
 
       expect(capabilities.search, isTrue);
       expect(capabilities.details, isTrue);
+      expect(capabilities.episodes, isTrue);
+      expect(capabilities.streaming, isTrue);
+      expect(capabilities.chapters, isTrue);
+      expect(capabilities.pages, isTrue);
+    });
+
+    test('can represent anime capabilities', () {
+      const capabilities = ProviderCapabilities(
+        search: true,
+        details: true,
+        episodes: true,
+        streaming: true,
+      );
+
+      expect(capabilities.search, isTrue);
+      expect(capabilities.details, isTrue);
+      expect(capabilities.episodes, isTrue);
+      expect(capabilities.streaming, isTrue);
+      expect(capabilities.chapters, isFalse);
+      expect(capabilities.pages, isFalse);
+    });
+
+    test('can represent manga capabilities', () {
+      const capabilities = ProviderCapabilities(
+        search: true,
+        details: true,
+        chapters: true,
+        pages: true,
+      );
+
+      expect(capabilities.search, isTrue);
+      expect(capabilities.details, isTrue);
+      expect(capabilities.episodes, isFalse);
+      expect(capabilities.streaming, isFalse);
+      expect(capabilities.chapters, isTrue);
+      expect(capabilities.pages, isTrue);
     });
   });
 
