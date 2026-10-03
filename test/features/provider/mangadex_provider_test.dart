@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:tohyou/features/provider/data/mangadex_client.dart';
+import 'package:tohyou/features/provider/data/mangadex_http_client.dart';
 import 'package:tohyou/features/provider/data/mangadex_provider.dart';
 import 'package:tohyou/features/provider/domain/manga_provider.dart';
+import 'package:tohyou/features/provider/domain/provider_exception.dart';
 
 class FakeMangaDexClient implements MangaDexClient {
   FakeMangaDexClient({
@@ -49,6 +51,32 @@ class FakeMangaDexClient implements MangaDexClient {
   @override
   Future<Map<String, dynamic>> getChapterPages(String chapterId) async {
     return getChapterPagesResponse;
+  }
+}
+
+class ThrowingMangaDexClient implements MangaDexClient {
+  const ThrowingMangaDexClient({required this.error});
+
+  final Exception error;
+
+  @override
+  Future<Map<String, dynamic>> getManga(String id) {
+    return Future<Map<String, dynamic>>.error(error);
+  }
+
+  @override
+  Future<Map<String, dynamic>> searchManga(String query) {
+    return Future<Map<String, dynamic>>.error(error);
+  }
+
+  @override
+  Future<Map<String, dynamic>> getChapters(String mangaId) {
+    return Future<Map<String, dynamic>>.error(error);
+  }
+
+  @override
+  Future<Map<String, dynamic>> getChapterPages(String chapterId) {
+    return Future<Map<String, dynamic>>.error(error);
   }
 }
 
@@ -120,7 +148,13 @@ void main() {
 
       expect(
         () => provider.search('One Piece'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -142,7 +176,13 @@ void main() {
 
       expect(
         () => provider.search('One Piece'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -163,7 +203,13 @@ void main() {
 
       expect(
         () => provider.search('One Piece'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -238,7 +284,13 @@ void main() {
 
       expect(
         () => provider.getDetails('manga-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -258,7 +310,13 @@ void main() {
 
       expect(
         () => provider.getDetails('manga-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -277,7 +335,13 @@ void main() {
 
       expect(
         () => provider.getDetails('manga-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -346,7 +410,13 @@ void main() {
 
       expect(
         () => provider.getChapters('manga-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -366,7 +436,13 @@ void main() {
 
       expect(
         () => provider.getChapters('manga-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -387,7 +463,13 @@ void main() {
 
       expect(
         () => provider.getChapters('manga-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -440,7 +522,13 @@ void main() {
 
       expect(
         () => provider.getPages('chapter-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -456,7 +544,13 @@ void main() {
 
       expect(
         () => provider.getPages('chapter-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -475,7 +569,13 @@ void main() {
 
       expect(
         () => provider.getPages('chapter-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -492,7 +592,13 @@ void main() {
 
       expect(
         () => provider.getPages('chapter-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
       );
     });
 
@@ -512,7 +618,77 @@ void main() {
 
       expect(
         () => provider.getPages('chapter-1'),
-        throwsA(isA<FormatException>()),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
+      );
+    });
+
+    test('converts MangaDex not found errors to ProviderException', () async {
+      final provider = MangaDexProvider(
+        client: ThrowingMangaDexClient(
+          error: const MangaDexHttpException(
+            statusCode: 404,
+            message: 'Not found',
+          ),
+        ),
+      );
+
+      expect(
+        () => provider.getDetails('missing'),
+        throwsA(
+          isA<ProviderException>()
+              .having((error) => error.type, 'type', ProviderErrorType.notFound)
+              .having((error) => error.providerId, 'providerId', 'mangadex'),
+        ),
+      );
+    });
+
+    test('converts MangaDex rate limit errors to unavailable', () async {
+      final provider = MangaDexProvider(
+        client: ThrowingMangaDexClient(
+          error: const MangaDexHttpException(
+            statusCode: 429,
+            message: 'Too many requests',
+          ),
+        ),
+      );
+
+      expect(
+        () => provider.search('One Piece'),
+        throwsA(
+          isA<ProviderException>()
+              .having(
+                (error) => error.type,
+                'type',
+                ProviderErrorType.unavailable,
+              )
+              .having((error) => error.providerId, 'providerId', 'mangadex'),
+        ),
+      );
+    });
+
+    test('converts MangaDex server errors to network errors', () async {
+      final provider = MangaDexProvider(
+        client: ThrowingMangaDexClient(
+          error: const MangaDexHttpException(
+            statusCode: 503,
+            message: 'Service unavailable',
+          ),
+        ),
+      );
+
+      expect(
+        () => provider.search('One Piece'),
+        throwsA(
+          isA<ProviderException>()
+              .having((error) => error.type, 'type', ProviderErrorType.network)
+              .having((error) => error.providerId, 'providerId', 'mangadex'),
+        ),
       );
     });
   });
