@@ -1,3 +1,5 @@
+import 'package:tohyou/features/provider/domain/provider_exception.dart';
+
 import 'anime.dart';
 import 'anime_provider.dart';
 import 'chapter.dart';
@@ -21,11 +23,19 @@ class ProviderService {
   AnimeProvider _getAnimeProvider(String providerId) {
     final provider = registry.getById(providerId);
 
+    if (provider == null) {
+      throw ProviderException(
+        type: ProviderErrorType.notFound,
+        message: 'Provider was not found',
+        providerId: providerId,
+      );
+    }
+
     if (provider is! AnimeProvider) {
-      throw ArgumentError.value(
-        providerId,
-        'providerId',
-        'Provider is not an anime provider',
+      throw ProviderException(
+        type: ProviderErrorType.unsupported,
+        message: 'Provider is not an anime provider',
+        providerId: providerId,
       );
     }
 
@@ -35,11 +45,19 @@ class ProviderService {
   MangaProvider _getMangaProvider(String providerId) {
     final provider = registry.getById(providerId);
 
+    if (provider == null) {
+      throw ProviderException(
+        type: ProviderErrorType.notFound,
+        message: 'Provider was not found',
+        providerId: providerId,
+      );
+    }
+
     if (provider is! MangaProvider) {
-      throw ArgumentError.value(
-        providerId,
-        'providerId',
-        'Provider is not a manga provider',
+      throw ProviderException(
+        type: ProviderErrorType.unsupported,
+        message: 'Provider is not a manga provider',
+        providerId: providerId,
       );
     }
 
@@ -82,7 +100,10 @@ class ProviderService {
     final providerId = selection.animeProviderId;
 
     if (providerId == null) {
-      throw StateError('No anime provider is selected');
+      throw const ProviderException(
+        type: ProviderErrorType.notFound,
+        message: 'No anime provider is selected',
+      );
     }
 
     return searchAnime(providerId, query);
@@ -92,7 +113,10 @@ class ProviderService {
     final providerId = selection.mangaProviderId;
 
     if (providerId == null) {
-      throw StateError('No manga provider is selected');
+      throw const ProviderException(
+        type: ProviderErrorType.notFound,
+        message: 'No manga provider is selected',
+      );
     }
 
     return searchManga(providerId, query);
@@ -102,7 +126,10 @@ class ProviderService {
     final providerId = selection.animeProviderId;
 
     if (providerId == null) {
-      throw StateError('No anime provider is selected');
+      throw const ProviderException(
+        type: ProviderErrorType.notFound,
+        message: 'No anime provider is selected',
+      );
     }
 
     return getAnimeDetails(providerId, id);
@@ -112,7 +139,10 @@ class ProviderService {
     final providerId = selection.mangaProviderId;
 
     if (providerId == null) {
-      throw StateError('No manga provider is selected');
+      throw const ProviderException(
+        type: ProviderErrorType.notFound,
+        message: 'No manga provider is selected',
+      );
     }
 
     return getMangaDetails(providerId, id);
@@ -122,7 +152,10 @@ class ProviderService {
     final providerId = selection.animeProviderId;
 
     if (providerId == null) {
-      throw StateError('No anime provider is selected');
+      throw const ProviderException(
+        type: ProviderErrorType.notFound,
+        message: 'No anime provider is selected',
+      );
     }
 
     return getEpisodes(providerId, animeId);
@@ -132,7 +165,10 @@ class ProviderService {
     final providerId = selection.animeProviderId;
 
     if (providerId == null) {
-      throw StateError('No anime provider is selected');
+      throw const ProviderException(
+        type: ProviderErrorType.notFound,
+        message: 'No anime provider is selected',
+      );
     }
 
     return getStreams(providerId, episodeId);
@@ -142,7 +178,10 @@ class ProviderService {
     final providerId = selection.mangaProviderId;
 
     if (providerId == null) {
-      throw StateError('No manga provider is selected');
+      throw const ProviderException(
+        type: ProviderErrorType.notFound,
+        message: 'No manga provider is selected',
+      );
     }
 
     return getChapters(providerId, mangaId);
@@ -152,7 +191,10 @@ class ProviderService {
     final providerId = selection.mangaProviderId;
 
     if (providerId == null) {
-      throw StateError('No manga provider is selected');
+      throw const ProviderException(
+        type: ProviderErrorType.notFound,
+        message: 'No manga provider is selected',
+      );
     }
 
     return getPages(providerId, chapterId);

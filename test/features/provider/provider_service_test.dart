@@ -5,6 +5,8 @@ import 'package:tohyou/features/provider/domain/provider_registry.dart';
 import 'package:tohyou/features/provider/domain/provider_selection.dart';
 import 'package:tohyou/features/provider/domain/provider_service.dart';
 
+import 'package:tohyou/features/provider/domain/provider_exception.dart';
+
 void main() {
   late ProviderService service;
 
@@ -76,19 +78,71 @@ void main() {
       expect(pages.first.index, 0);
     });
 
-    test('throws for unknown anime provider id', () async {
+    test('throws ProviderException for unknown anime provider', () {
       expect(
-        () => service.searchAnime('missing', 'One'),
-        throwsA(isA<ArgumentError>()),
+        () => service.searchAnime('unknown', 'One'),
+        throwsA(
+          isA<ProviderException>()
+              .having((error) => error.type, 'type', ProviderErrorType.notFound)
+              .having((error) => error.providerId, 'providerId', 'unknown'),
+        ),
       );
     });
 
-    test('throws when manga operation receives anime provider id', () async {
+    test(
+      'throws ProviderException for manga provider used as anime provider',
+      () {
+        expect(
+          () => service.searchAnime('mock-manga', 'One'),
+          throwsA(
+            isA<ProviderException>()
+                .having(
+                  (error) => error.type,
+                  'type',
+                  ProviderErrorType.unsupported,
+                )
+                .having(
+                  (error) => error.providerId,
+                  'providerId',
+                  'mock-manga',
+                ),
+          ),
+        );
+      },
+    );
+
+    test('throws ProviderException for unknown manga provider', () {
       expect(
-        () => service.searchManga('mock-anime', 'One'),
-        throwsA(isA<ArgumentError>()),
+        () => service.searchManga('unknown', 'One'),
+        throwsA(
+          isA<ProviderException>()
+              .having((error) => error.type, 'type', ProviderErrorType.notFound)
+              .having((error) => error.providerId, 'providerId', 'unknown'),
+        ),
       );
     });
+
+    test(
+      'throws ProviderException for anime provider used as manga provider',
+      () {
+        expect(
+          () => service.searchManga('mock-anime', 'One'),
+          throwsA(
+            isA<ProviderException>()
+                .having(
+                  (error) => error.type,
+                  'type',
+                  ProviderErrorType.unsupported,
+                )
+                .having(
+                  (error) => error.providerId,
+                  'providerId',
+                  'mock-anime',
+                ),
+          ),
+        );
+      },
+    );
 
     test('searches anime through the selected provider', () async {
       final selectedService = ProviderService(
@@ -219,29 +273,41 @@ void main() {
       expect(pages.first.index, 0);
     });
 
-    test('throws when no anime provider is selected', () {
-      final selectedService = ProviderService(
-        ProviderRegistry(
-          providers: [const MockAnimeProvider(), const MockMangaProvider()],
-        ),
+    test('throws ProviderException when no anime provider is selected', () {
+      final noSelectionService = ProviderService(
+        ProviderRegistry(providers: [MockAnimeProvider(), MockMangaProvider()]),
       );
 
       expect(
-        () => selectedService.searchSelectedAnime('One'),
-        throwsA(isA<StateError>()),
+        () => noSelectionService.searchSelectedAnime('One'),
+        throwsA(
+          isA<ProviderException>()
+              .having((error) => error.type, 'type', ProviderErrorType.notFound)
+              .having(
+                (error) => error.message,
+                'message',
+                'No anime provider is selected',
+              ),
+        ),
       );
     });
 
-    test('throws when no manga provider is selected', () {
-      final selectedService = ProviderService(
-        ProviderRegistry(
-          providers: [const MockAnimeProvider(), const MockMangaProvider()],
-        ),
+    test('throws ProviderException when no manga provider is selected', () {
+      final noSelectionService = ProviderService(
+        ProviderRegistry(providers: [MockAnimeProvider(), MockMangaProvider()]),
       );
 
       expect(
-        () => selectedService.searchSelectedManga('One'),
-        throwsA(isA<StateError>()),
+        () => noSelectionService.searchSelectedManga('One'),
+        throwsA(
+          isA<ProviderException>()
+              .having((error) => error.type, 'type', ProviderErrorType.notFound)
+              .having(
+                (error) => error.message,
+                'message',
+                'No manga provider is selected',
+              ),
+        ),
       );
     });
   });
