@@ -10,6 +10,9 @@ class FakeMangaDexClient implements MangaDexClient {
   FakeMangaDexClient({
     this.searchResponse = const <String, dynamic>{
       'result': 'ok',
+      'limit': 10,
+      'offset': 0,
+      'total': 0,
       'data': <dynamic>[],
     },
     this.getMangaResponse = const <String, dynamic>{
@@ -19,6 +22,9 @@ class FakeMangaDexClient implements MangaDexClient {
     },
     this.getChaptersResponse = const <String, dynamic>{
       'result': 'ok',
+      'limit': 100,
+      'offset': 0,
+      'total': 0,
       'data': <dynamic>[],
     },
     this.getChapterPagesResponse = const <String, dynamic>{
@@ -112,6 +118,9 @@ void main() {
         client: FakeMangaDexClient(
           searchResponse: <String, dynamic>{
             'result': 'ok',
+            'limit': 10,
+            'offset': 20,
+            'total': 42,
             'data': <dynamic>[
               <String, dynamic>{
                 'id': 'manga-1',
@@ -163,6 +172,9 @@ void main() {
         client: FakeMangaDexClient(
           searchResponse: <String, dynamic>{
             'result': 'ok',
+            'limit': 10,
+            'offset': 0,
+            'total': 1,
             'data': <dynamic>[
               <String, dynamic>{
                 'attributes': <String, dynamic>{
@@ -191,12 +203,155 @@ void main() {
         client: FakeMangaDexClient(
           searchResponse: <String, dynamic>{
             'result': 'ok',
+            'limit': 10,
+            'offset': 0,
+            'total': 1,
             'data': <dynamic>[
               <String, dynamic>{
                 'id': 'manga-1',
                 'attributes': <String, dynamic>{'title': <String, dynamic>{}},
               },
             ],
+          },
+        ),
+      );
+
+      expect(
+        () => provider.search('One Piece'),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
+      );
+    });
+
+    test('accepts valid MangaDex pagination metadata', () async {
+      final provider = MangaDexProvider(
+        client: FakeMangaDexClient(
+          searchResponse: <String, dynamic>{
+            'result': 'ok',
+            'limit': 10,
+            'offset': 20,
+            'total': 42,
+            'data': <dynamic>[],
+          },
+        ),
+      );
+
+      final results = await provider.search('One Piece');
+
+      expect(results, isEmpty);
+    });
+
+    test('pagination throws when metadata is missing', () async {
+      final provider = MangaDexProvider(
+        client: FakeMangaDexClient(
+          searchResponse: <String, dynamic>{
+            'result': 'ok',
+            'data': <dynamic>[],
+          },
+        ),
+      );
+
+      expect(
+        () => provider.search('One Piece'),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
+      );
+    });
+
+    test('pagination throws when a value is not an integer', () async {
+      final provider = MangaDexProvider(
+        client: FakeMangaDexClient(
+          searchResponse: <String, dynamic>{
+            'result': 'ok',
+            'limit': '10',
+            'offset': 0,
+            'total': 42,
+            'data': <dynamic>[],
+          },
+        ),
+      );
+
+      expect(
+        () => provider.search('One Piece'),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
+      );
+    });
+
+    test('pagination throws when offset is negative', () async {
+      final provider = MangaDexProvider(
+        client: FakeMangaDexClient(
+          searchResponse: <String, dynamic>{
+            'result': 'ok',
+            'limit': 10,
+            'offset': -1,
+            'total': 42,
+            'data': <dynamic>[],
+          },
+        ),
+      );
+
+      expect(
+        () => provider.search('One Piece'),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
+      );
+    });
+
+    test('pagination throws when limit is negative', () async {
+      final provider = MangaDexProvider(
+        client: FakeMangaDexClient(
+          searchResponse: <String, dynamic>{
+            'result': 'ok',
+            'limit': -1,
+            'offset': 0,
+            'total': 42,
+            'data': <dynamic>[],
+          },
+        ),
+      );
+
+      expect(
+        () => provider.search('One Piece'),
+        throwsA(
+          isA<ProviderException>().having(
+            (error) => error.type,
+            'type',
+            ProviderErrorType.invalidResponse,
+          ),
+        ),
+      );
+    });
+
+    test('pagination throws when total is invalid', () async {
+      final provider = MangaDexProvider(
+        client: FakeMangaDexClient(
+          searchResponse: <String, dynamic>{
+            'result': 'ok',
+            'limit': 10,
+            'offset': 0,
+            'total': -1,
+            'data': <dynamic>[],
           },
         ),
       );
@@ -350,6 +505,9 @@ void main() {
         client: FakeMangaDexClient(
           getChaptersResponse: <String, dynamic>{
             'result': 'ok',
+            'limit': 100,
+            'offset': 0,
+            'total': 1,
             'data': <dynamic>[
               <String, dynamic>{
                 'id': 'chapter-1',
@@ -386,6 +544,9 @@ void main() {
         client: FakeMangaDexClient(
           getChaptersResponse: <String, dynamic>{
             'result': 'ok',
+            'limit': 100,
+            'offset': 0,
+            'total': 1,
             'data': <dynamic>[
               <String, dynamic>{
                 'id': 'chapter-1',
@@ -425,6 +586,9 @@ void main() {
         client: FakeMangaDexClient(
           getChaptersResponse: <String, dynamic>{
             'result': 'ok',
+            'limit': 100,
+            'offset': 0,
+            'total': 1,
             'data': <dynamic>[
               <String, dynamic>{
                 'attributes': <String, dynamic>{'chapter': '1'},
@@ -451,6 +615,9 @@ void main() {
         client: FakeMangaDexClient(
           getChaptersResponse: <String, dynamic>{
             'result': 'ok',
+            'limit': 100,
+            'offset': 0,
+            'total': 1,
             'data': <dynamic>[
               <String, dynamic>{
                 'id': 'chapter-1',

@@ -50,6 +50,8 @@ class MangaDexProvider implements MangaProvider {
         throw const FormatException('MangaDex search response is missing data');
       }
 
+      _validatePagination(response);
+
       return data.whereType<Map<String, dynamic>>().map(_parseManga).toList();
     });
   }
@@ -85,6 +87,8 @@ class MangaDexProvider implements MangaProvider {
           'MangaDex chapters response is missing data',
         );
       }
+
+      _validatePagination(response);
 
       return data.whereType<Map<String, dynamic>>().map(_parseChapter).toList();
     });
@@ -170,6 +174,24 @@ class MangaDexProvider implements MangaProvider {
     }
 
     return ProviderErrorType.network;
+  }
+
+  void _validatePagination(Map<String, dynamic> response) {
+    final limit = response['limit'];
+    final offset = response['offset'];
+    final total = response['total'];
+
+    if (limit is! int || offset is! int || total is! int) {
+      throw const FormatException(
+        'MangaDex response contains invalid pagination metadata',
+      );
+    }
+
+    if (limit < 0 || offset < 0 || total < 0) {
+      throw const FormatException(
+        'MangaDex response contains impossible pagination metadata',
+      );
+    }
   }
 
   Chapter _parseChapter(Map<String, dynamic> data) {
