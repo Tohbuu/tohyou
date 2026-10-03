@@ -59,8 +59,8 @@ void main() {
       final mangaProvider = provider! as MockMangaProvider;
       final results = await mangaProvider.search('Two');
 
-      expect(results, hasLength(1));
-      expect(results.single.title, 'Mock Manga Two');
+      expect(results.items, hasLength(1));
+      expect(results.items.single.title, 'Mock Manga Two');
     });
   });
 }

@@ -45,12 +45,20 @@ class FakeMangaDexClient implements MangaDexClient {
   }
 
   @override
-  Future<Map<String, dynamic>> searchManga(String query) async {
+  Future<Map<String, dynamic>> searchManga(
+    String query, {
+    int offset = 0,
+    int limit = 20,
+  }) async {
     return searchResponse;
   }
 
   @override
-  Future<Map<String, dynamic>> getChapters(String mangaId) async {
+  Future<Map<String, dynamic>> getChapters(
+    String mangaId, {
+    int offset = 0,
+    int limit = 20,
+  }) async {
     return getChaptersResponse;
   }
 
@@ -71,12 +79,20 @@ class ThrowingMangaDexClient implements MangaDexClient {
   }
 
   @override
-  Future<Map<String, dynamic>> searchManga(String query) {
+  Future<Map<String, dynamic>> searchManga(
+    String query, {
+    int offset = 0,
+    int limit = 20,
+  }) {
     return Future<Map<String, dynamic>>.error(error);
   }
 
   @override
-  Future<Map<String, dynamic>> getChapters(String mangaId) {
+  Future<Map<String, dynamic>> getChapters(
+    String mangaId, {
+    int offset = 0,
+    int limit = 20,
+  }) {
     return Future<Map<String, dynamic>>.error(error);
   }
 
@@ -139,13 +155,17 @@ void main() {
         ),
       );
 
-      final results = await provider.search('One Piece');
+      final results = await provider.search('One Piece', offset: 20, limit: 10);
 
-      expect(results, hasLength(2));
-      expect(results[0].id, 'manga-1');
-      expect(results[0].title, 'One Piece');
-      expect(results[1].id, 'manga-2');
-      expect(results[1].title, 'ワンピース');
+      expect(results.items, hasLength(2));
+      expect(results.offset, 20);
+      expect(results.limit, 10);
+      expect(results.total, 42);
+      expect(results.hasMore, isTrue);
+      expect(results.items[0].id, 'manga-1');
+      expect(results.items[0].title, 'One Piece');
+      expect(results.items[1].id, 'manga-2');
+      expect(results.items[1].title, 'ワンピース');
     });
 
     test('search throws when data is missing', () async {
@@ -174,7 +194,7 @@ void main() {
             'result': 'ok',
             'limit': 10,
             'offset': 0,
-            'total': 1,
+            'total': 2,
             'data': <dynamic>[
               <String, dynamic>{
                 'attributes': <String, dynamic>{
@@ -243,7 +263,7 @@ void main() {
 
       final results = await provider.search('One Piece');
 
-      expect(results, isEmpty);
+      expect(results.items, isEmpty);
     });
 
     test('pagination throws when metadata is missing', () async {
@@ -507,7 +527,7 @@ void main() {
             'result': 'ok',
             'limit': 100,
             'offset': 0,
-            'total': 1,
+            'total': 2,
             'data': <dynamic>[
               <String, dynamic>{
                 'id': 'chapter-1',
@@ -530,13 +550,17 @@ void main() {
 
       final chapters = await provider.getChapters('manga-1');
 
-      expect(chapters, hasLength(2));
-      expect(chapters[0].id, 'chapter-1');
-      expect(chapters[0].number, 1);
-      expect(chapters[0].title, 'The Beginning');
-      expect(chapters[1].id, 'chapter-2');
-      expect(chapters[1].number, 2);
-      expect(chapters[1].title, 'The Journey');
+      expect(chapters.items, hasLength(2));
+      expect(chapters.offset, 0);
+      expect(chapters.limit, 100);
+      expect(chapters.total, 2);
+      expect(chapters.hasMore, isFalse);
+      expect(chapters.items[0].id, 'chapter-1');
+      expect(chapters.items[0].number, 1);
+      expect(chapters.items[0].title, 'The Beginning');
+      expect(chapters.items[1].id, 'chapter-2');
+      expect(chapters.items[1].number, 2);
+      expect(chapters.items[1].title, 'The Journey');
     });
 
     test('uses a fallback title when chapter title is missing', () async {
@@ -559,7 +583,7 @@ void main() {
 
       final chapters = await provider.getChapters('manga-1');
 
-      expect(chapters.single.title, 'Chapter 1');
+      expect(chapters.items.single.title, 'Chapter 1');
     });
 
     test('chapters throw when data is missing', () async {

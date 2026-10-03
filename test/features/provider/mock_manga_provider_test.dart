@@ -23,22 +23,32 @@ void main() {
     test('search returns matching manga', () async {
       final results = await provider.search('One');
 
-      expect(results, hasLength(1));
-      expect(results.single.id, 'mock-manga-1');
-      expect(results.single.title, 'Mock Manga One');
+      expect(results.items, hasLength(1));
+      expect(results.items.single.id, 'mock-manga-1');
+      expect(results.items.single.title, 'Mock Manga One');
     });
 
     test('search is case insensitive', () async {
       final results = await provider.search('mock manga two');
 
-      expect(results, hasLength(1));
-      expect(results.single.id, 'mock-manga-2');
+      expect(results.items, hasLength(1));
+      expect(results.items.single.id, 'mock-manga-2');
     });
 
     test('empty search returns all manga', () async {
       final results = await provider.search('');
 
-      expect(results, hasLength(2));
+      expect(results.items, hasLength(2));
+    });
+
+    test('search returns a requested page', () async {
+      final results = await provider.search('', offset: 1, limit: 1);
+
+      expect(results.items.single.id, 'mock-manga-2');
+      expect(results.offset, 1);
+      expect(results.limit, 1);
+      expect(results.total, 2);
+      expect(results.hasMore, isFalse);
     });
 
     test('getDetails returns matching manga', () async {
@@ -57,16 +67,29 @@ void main() {
     test('getChapters returns chapters for known manga', () async {
       final chapters = await provider.getChapters('mock-manga-1');
 
-      expect(chapters, hasLength(3));
-      expect(chapters[0].number, 1);
-      expect(chapters[1].number, 2);
-      expect(chapters[2].number, 3);
+      expect(chapters.items, hasLength(3));
+      expect(chapters.items[0].number, 1);
+      expect(chapters.items[1].number, 2);
+      expect(chapters.items[2].number, 3);
     });
 
     test('getChapters returns empty list for unknown manga', () async {
       final chapters = await provider.getChapters('missing');
 
-      expect(chapters, isEmpty);
+      expect(chapters.items, isEmpty);
+    });
+
+    test('getChapters returns an empty final page', () async {
+      final chapters = await provider.getChapters(
+        'mock-manga-1',
+        offset: 3,
+        limit: 20,
+      );
+
+      expect(chapters.items, isEmpty);
+      expect(chapters.hasMore, isFalse);
+      expect(chapters.offset, 3);
+      expect(chapters.total, 3);
     });
 
     test('getPages returns chapter pages', () async {

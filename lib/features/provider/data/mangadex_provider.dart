@@ -2,6 +2,7 @@ import '../domain/chapter.dart';
 import '../domain/chapter_page.dart';
 import '../domain/manga.dart';
 import '../domain/manga_provider.dart';
+import '../domain/paginated_result.dart';
 import '../domain/provider_capabilities.dart';
 import '../domain/provider_exception.dart';
 import '../domain/provider_type.dart';
@@ -41,18 +42,26 @@ class MangaDexProvider implements MangaProvider {
   }
 
   @override
-  Future<List<Manga>> search(String query) {
+  Future<PaginatedResult<Manga>> search(
+    String query, {
+    int offset = 0,
+    int limit = 20,
+  }) {
     return _withProviderErrors(() async {
-      final response = await client.searchManga(query);
+      final response = await client.searchManga(
+        query,
+        offset: offset,
+        limit: limit,
+      );
       final data = response['data'];
 
       if (data is! List) {
         throw const FormatException('MangaDex search response is missing data');
       }
 
-      _validatePagination(response);
+      final items = data.whereType<Map<String, dynamic>>().map(_parseManga);
 
-      return data.whereType<Map<String, dynamic>>().map(_parseManga).toList();
+      return _buildPaginatedResult(response, items.toList());
     });
   }
 
@@ -77,9 +86,17 @@ class MangaDexProvider implements MangaProvider {
   }
 
   @override
-  Future<List<Chapter>> getChapters(String mangaId) {
+  Future<PaginatedResult<Chapter>> getChapters(
+    String mangaId, {
+    int offset = 0,
+    int limit = 20,
+  }) {
     return _withProviderErrors(() async {
-      final response = await client.getChapters(mangaId);
+      final response = await client.getChapters(
+        mangaId,
+        offset: offset,
+        limit: limit,
+      );
       final data = response['data'];
 
       if (data is! List) {
@@ -88,9 +105,9 @@ class MangaDexProvider implements MangaProvider {
         );
       }
 
-      _validatePagination(response);
+      final items = data.whereType<Map<String, dynamic>>().map(_parseChapter);
 
-      return data.whereType<Map<String, dynamic>>().map(_parseChapter).toList();
+      return _buildPaginatedResult(response, items.toList());
     });
   }
 
@@ -191,6 +208,24 @@ class MangaDexProvider implements MangaProvider {
       throw const FormatException(
         'MangaDex response contains impossible pagination metadata',
       );
+    }
+  }
+
+  PaginatedResult<T> _buildPaginatedResult<T>(
+    Map<String, dynamic> response,
+    List<T> items,
+  ) {
+    _validatePagination(response);
+
+    try {
+      return PaginatedResult(
+        items: items,
+        offset: response['offset'] as int,
+        limit: response['limit'] as int,
+        total: response['total'] as int,
+      );
+    } on ArgumentError catch (error) {
+      throw FormatException(error.message.toString());
     }
   }
 

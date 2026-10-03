@@ -19,15 +19,34 @@ class MangaDexHttpClient implements MangaDexClient {
   }
 
   @override
-  Future<Map<String, dynamic>> searchManga(String query) async {
-    return _get('/manga', queryParameters: <String, String>{'title': query});
+  Future<Map<String, dynamic>> searchManga(
+    String query, {
+    int offset = 0,
+    int limit = 20,
+  }) async {
+    return _get(
+      '/manga',
+      queryParameters: <String, String>{
+        'title': query,
+        'offset': '$offset',
+        'limit': '$limit',
+      },
+    );
   }
 
   @override
-  Future<Map<String, dynamic>> getChapters(String mangaId) async {
+  Future<Map<String, dynamic>> getChapters(
+    String mangaId, {
+    int offset = 0,
+    int limit = 20,
+  }) async {
     return _get(
       '/chapter',
-      queryParameters: <String, String>{'manga': mangaId},
+      queryParameters: <String, String>{
+        'manga': mangaId,
+        'offset': '$offset',
+        'limit': '$limit',
+      },
     );
   }
 

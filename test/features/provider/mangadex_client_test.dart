@@ -9,12 +9,20 @@ class FakeMangaDexClient implements MangaDexClient {
   }
 
   @override
-  Future<Map<String, dynamic>> searchManga(String query) async {
+  Future<Map<String, dynamic>> searchManga(
+    String query, {
+    int offset = 0,
+    int limit = 20,
+  }) async {
     return <String, dynamic>{'query': query};
   }
 
   @override
-  Future<Map<String, dynamic>> getChapters(String mangaId) async {
+  Future<Map<String, dynamic>> getChapters(
+    String mangaId, {
+    int offset = 0,
+    int limit = 20,
+  }) async {
     return <String, dynamic>{'mangaId': mangaId};
   }
 

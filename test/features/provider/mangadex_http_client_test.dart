@@ -39,6 +39,8 @@ void main() {
         httpClient: MockClient((request) async {
           expect(request.url.path, '/manga');
           expect(request.url.queryParameters['title'], 'One Piece');
+          expect(request.url.queryParameters['offset'], '0');
+          expect(request.url.queryParameters['limit'], '20');
 
           return http.Response(
             jsonEncode(<String, dynamic>{'result': 'ok', 'data': <dynamic>[]}),
@@ -57,6 +59,8 @@ void main() {
         httpClient: MockClient((request) async {
           expect(request.url.path, '/chapter');
           expect(request.url.queryParameters['manga'], 'manga-1');
+          expect(request.url.queryParameters['offset'], '0');
+          expect(request.url.queryParameters['limit'], '20');
 
           return http.Response(
             jsonEncode(<String, dynamic>{'result': 'ok', 'data': <dynamic>[]}),

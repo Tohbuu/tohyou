@@ -7,6 +7,7 @@ import 'chapter_page.dart';
 import 'episode.dart';
 import 'manga.dart';
 import 'manga_provider.dart';
+import 'paginated_result.dart';
 import 'provider_registry.dart';
 import 'stream_source.dart';
 import 'provider_selection.dart';
@@ -80,16 +81,28 @@ class ProviderService {
     return _getAnimeProvider(providerId).getStreams(episodeId);
   }
 
-  Future<List<Manga>> searchManga(String providerId, String query) {
-    return _getMangaProvider(providerId).search(query);
+  Future<PaginatedResult<Manga>> searchManga(
+    String providerId,
+    String query, {
+    int offset = 0,
+    int limit = 20,
+  }) {
+    return _getMangaProvider(providerId)
+        .search(query, offset: offset, limit: limit);
   }
 
   Future<Manga?> getMangaDetails(String providerId, String id) {
     return _getMangaProvider(providerId).getDetails(id);
   }
 
-  Future<List<Chapter>> getChapters(String providerId, String mangaId) {
-    return _getMangaProvider(providerId).getChapters(mangaId);
+  Future<PaginatedResult<Chapter>> getChapters(
+    String providerId,
+    String mangaId, {
+    int offset = 0,
+    int limit = 20,
+  }) {
+    return _getMangaProvider(providerId)
+        .getChapters(mangaId, offset: offset, limit: limit);
   }
 
   Future<List<ChapterPage>> getPages(String providerId, String chapterId) {
@@ -109,7 +122,11 @@ class ProviderService {
     return searchAnime(providerId, query);
   }
 
-  Future<List<Manga>> searchSelectedManga(String query) {
+  Future<PaginatedResult<Manga>> searchSelectedManga(
+    String query, {
+    int offset = 0,
+    int limit = 20,
+  }) {
     final providerId = selection.mangaProviderId;
 
     if (providerId == null) {
@@ -119,7 +136,7 @@ class ProviderService {
       );
     }
 
-    return searchManga(providerId, query);
+    return searchManga(providerId, query, offset: offset, limit: limit);
   }
 
   Future<Anime?> getSelectedAnimeDetails(String id) {
@@ -174,7 +191,11 @@ class ProviderService {
     return getStreams(providerId, episodeId);
   }
 
-  Future<List<Chapter>> getSelectedChapters(String mangaId) {
+  Future<PaginatedResult<Chapter>> getSelectedChapters(
+    String mangaId, {
+    int offset = 0,
+    int limit = 20,
+  }) {
     final providerId = selection.mangaProviderId;
 
     if (providerId == null) {
@@ -184,7 +205,7 @@ class ProviderService {
       );
     }
 
-    return getChapters(providerId, mangaId);
+    return getChapters(providerId, mangaId, offset: offset, limit: limit);
   }
 
   Future<List<ChapterPage>> getSelectedPages(String chapterId) {

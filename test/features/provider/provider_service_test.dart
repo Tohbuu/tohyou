@@ -50,8 +50,8 @@ void main() {
     test('searches manga through selected provider', () async {
       final results = await service.searchManga('mock-manga', 'One');
 
-      expect(results, hasLength(1));
-      expect(results.first.id, 'mock-manga-1');
+      expect(results.items, hasLength(1));
+      expect(results.items.first.id, 'mock-manga-1');
     });
 
     test('gets manga details through selected provider', () async {
@@ -64,8 +64,8 @@ void main() {
     test('gets manga chapters through selected provider', () async {
       final chapters = await service.getChapters('mock-manga', 'mock-manga-1');
 
-      expect(chapters, hasLength(3));
-      expect(chapters.first.number, 1);
+      expect(chapters.items, hasLength(3));
+      expect(chapters.items.first.number, 1);
     });
 
     test('gets manga pages through selected provider', () async {
@@ -174,8 +174,8 @@ void main() {
 
       final results = await selectedService.searchSelectedManga('One');
 
-      expect(results, hasLength(1));
-      expect(results.first.id, 'mock-manga-1');
+      expect(results.items, hasLength(1));
+      expect(results.items.first.id, 'mock-manga-1');
     });
 
     test('gets anime details through the selected provider', () async {
@@ -253,8 +253,8 @@ void main() {
         'mock-manga-1',
       );
 
-      expect(chapters, hasLength(3));
-      expect(chapters.first.number, 1);
+      expect(chapters.items, hasLength(3));
+      expect(chapters.items.first.number, 1);
     });
 
     test('gets manga pages through selected provider', () async {

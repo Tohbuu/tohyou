@@ -2,6 +2,7 @@ import '../domain/chapter.dart';
 import '../domain/manga.dart';
 import '../domain/manga_provider.dart';
 import '../domain/chapter_page.dart';
+import '../domain/paginated_result.dart';
 import '../domain/provider_capabilities.dart';
 import '../domain/provider_type.dart';
 
@@ -26,7 +27,11 @@ class MockMangaProvider implements MangaProvider {
   );
 
   @override
-  Future<List<Manga>> search(String query) async {
+  Future<PaginatedResult<Manga>> search(
+    String query, {
+    int offset = 0,
+    int limit = 20,
+  }) async {
     const results = [
       Manga(
         id: 'mock-manga-1',
@@ -40,15 +45,29 @@ class MockMangaProvider implements MangaProvider {
       ),
     ];
 
-    if (query.trim().isEmpty) {
-      return results;
-    }
+    final filteredResults = query.trim().isEmpty
+        ? results
+        : results
+              .where(
+                (manga) => manga.title.toLowerCase().contains(
+                  query.trim().toLowerCase(),
+                ),
+              )
+              .toList();
 
-    final normalizedQuery = query.trim().toLowerCase();
+    final pageEnd = (offset + limit < filteredResults.length)
+        ? offset + limit
+        : filteredResults.length;
+    final pageItems = offset < filteredResults.length
+        ? filteredResults.sublist(offset, pageEnd)
+        : <Manga>[];
 
-    return results
-        .where((manga) => manga.title.toLowerCase().contains(normalizedQuery))
-        .toList();
+    return PaginatedResult(
+      items: pageItems,
+      offset: offset,
+      limit: limit,
+      total: filteredResults.length,
+    );
   }
 
   @override
@@ -67,16 +86,40 @@ class MockMangaProvider implements MangaProvider {
   }
 
   @override
-  Future<List<Chapter>> getChapters(String mangaId) async {
+  Future<PaginatedResult<Chapter>> getChapters(
+    String mangaId, {
+    int offset = 0,
+    int limit = 20,
+  }) async {
+    late final List<Chapter> chapters;
+
     if (mangaId != 'mock-manga-1') {
-      return [];
+      chapters = [];
+    } else {
+      chapters = const [
+        Chapter(id: 'mock-manga-1-chapter-1', number: 1, title: 'Chapter One'),
+        Chapter(id: 'mock-manga-1-chapter-2', number: 2, title: 'Chapter Two'),
+        Chapter(
+          id: 'mock-manga-1-chapter-3',
+          number: 3,
+          title: 'Chapter Three',
+        ),
+      ];
     }
 
-    return const [
-      Chapter(id: 'mock-manga-1-chapter-1', number: 1, title: 'Chapter One'),
-      Chapter(id: 'mock-manga-1-chapter-2', number: 2, title: 'Chapter Two'),
-      Chapter(id: 'mock-manga-1-chapter-3', number: 3, title: 'Chapter Three'),
-    ];
+    final pageEnd = (offset + limit < chapters.length)
+        ? offset + limit
+        : chapters.length;
+    final pageItems = offset < chapters.length
+        ? chapters.sublist(offset, pageEnd)
+        : <Chapter>[];
+
+    return PaginatedResult(
+      items: pageItems,
+      offset: offset,
+      limit: limit,
+      total: chapters.length,
+    );
   }
 
   @override

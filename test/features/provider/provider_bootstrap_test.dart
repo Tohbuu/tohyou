@@ -36,8 +36,8 @@ void main() {
         expect(animeResults, hasLength(1));
         expect(animeResults.single.title, 'Mock Anime One');
 
-        expect(mangaResults, hasLength(1));
-        expect(mangaResults.single.title, 'Mock Manga One');
+        expect(mangaResults.items, hasLength(1));
+        expect(mangaResults.items.single.title, 'Mock Manga One');
       },
     );
 
@@ -71,8 +71,8 @@ void main() {
       expect(animeResults, hasLength(1));
       expect(animeResults.single.id, 'mock-anime-1');
 
-      expect(mangaResults, hasLength(1));
-      expect(mangaResults.single.id, 'mock-manga-1');
+      expect(mangaResults.items, hasLength(1));
+      expect(mangaResults.items.single.id, 'mock-manga-1');
     });
   });
 }
